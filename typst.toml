@@ -1,11 +1,11 @@
 [package]
-name = "typsium-"
+name = "typsium-atomic"
 version = "0.1.0"
-repository = "https://github.com/Typsium/typsium"
+repository = "https://github.com/Typsium/typsium-atomic"
 license = "MIT"
 entrypoint = "lib.typ"
-authors = [""]
-description = "Display and format something in Typst."
+authors = ["Aarav Garg <https://github.com/aargar1>"]
+description = "Draw Atoms, their electron configurations, shells and orbitals in Typst."
 categories = [ "layout", "text", "paper" ]
 disciplines = [ "education", "chemistry" ]
-keywords = ["chemistry", "chemical", "reaction", "formula", "equation", "electron", "atom", "molecule"]
+keywords = ["chemistry", "chemical", "formula", "electron", "atom", "orbital", "shell", "configuration", "Bohr", "model"]
