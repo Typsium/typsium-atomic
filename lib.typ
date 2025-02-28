@@ -1,49 +1,197 @@
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.2": draw, canvas
+#import "@preview/typsium:0.2.0": get-element
 
-#let draw_shell(radius, electrons, color: luma(90%)) = {
-  import cetz.draw: *
+
+#let is-metadata(it) = {
+  type(it) == content and it.func() == metadata
+}
+
+/// Determine if a content is a metadata with a specific kind.
+#let is-kind(it, kind) = {
+  type(it.value) == dictionary and it.value.at("kind", default: none) == kind
+}
+
+#let get-element-dict(element)={
+  if is-metadata(element) and is-kind(element, "element"){
+    return element.value
+  }
+}
+
+
+#let draw-shell(
+  electrons: 0,
+  radius: 1,
+  fill: luma(90%),
+  stroke: 1pt + black,
+)={
+  import draw: set-style, circle, content
+  set-style(content: (padding: .2), fill: fill, stroke: stroke)
 
   circle((0,0), radius: radius, fill: none)
 
-  set-style(content: (padding: .2),
-      fill: color,
-      stroke: black)
-
   for i in range(electrons) {
-    circle((radius*calc.sin(360deg/electrons*i), radius*calc.cos(360deg/electrons*i)), radius: 0.13)
-    content((), math.minus)
+    circle(
+      (radius*calc.sin(360deg/electrons*i),
+      radius*calc.cos(360deg/electrons*i)),
+      radius: 0.13)
+    content((), padding: (bottom: 0.05),text(0.7em, math.minus))
   }
 }
 
-#let draw-core(atomic-number, mass-number, element, radius: 0.6, color: luma(90%)) = {
-  import cetz.draw: *
+#let draw-core(
+  atomic-number: none, 
+  mass-number: none, 
+  symbol: none, 
+  core-radius: 0.6, 
+  fill: luma(90%),
+  stroke: 1pt + black,
+) = {
+  import draw: set-style, circle, content
+  set-style(content: (padding: 0.2), fill: fill, stroke: stroke)
   
-  if (element.len() < 2){
-    element = element + " "
+  if (symbol.len() < 2){
+    symbol += " "
   }
-  set-style(content: (padding: .2),
-      fill: color,
-      stroke: black)
-
-  circle((0, 0), radius: radius)
-  content((),$""_atomic-number^(mass-number)element,)
+  
+  circle((0, 0), radius: core-radius)
+  content((),$""_(#atomic-number)^(#mass-number)symbol$,)
 }
 
-#let draw-atom-shells-canvas(atomic-number, mass-number, element, electrons, shells: 1.0, step: 0.4, center: 0.6, color: luma(90%)) = {
-  import cetz.draw: *
+#let validate-element(element)={
+  if type(element) != dictionary{
+    let candidate
+    if type(element) == str{
+      candidate = get-element(symbol: element).value
+    } else if is-metadata(element){
+      candidate = get-element-dict(element)
+    }else if  type(element) == int{
+      candidate = get-element(atomic-number: element).value
+    }
+    
+    if candidate != none{
+      element = (
+        atomic-number: candidate.atomic-number,
+        mass-number: candidate.at("most-common-isotope", default: candidate.at("mass-number", default: none)),
+        symbol: candidate.symbol
+      )
+    } else{
+      element = (
+        atomic-number: none,
+        mass-number: none,
+        symbol: ""
+      )
+    }
+  }
+  return element
+}
+
+#let validate-electrons(electrons)={
+  if electrons == none or electrons == auto{
+    return (0,)
+  } else if type(electrons) == int or type(electrons) == float{
+    let electron-shells = calc.floor(calc.sqrt(electrons/2)) + 1
+    let rounds = ()
+
+    for i in range(electron-shells) {
+      if (electrons > 2*calc.pow(i+1, 2)){
+        rounds.push(2*calc.pow(i+1, 2))
+        electrons = electrons - (2*calc.pow(i+1, 2))
+      } else {
+        rounds.push(electrons)
+      }
+    }
+    return rounds
+  } else if type(electrons.first()) == array{
+    return electrons.map(x=> x.at(1))
+  }
+  return electrons
+}
+
+#let draw-atom-shells(
+  element:(
+    atomic-number: 1,
+    mass-number: 1,
+    symbol: "H",
+  ),
+  electrons: (1,),
+  core-distance: 1,
+  shell-distance: 0.4,
+  core-radius: 0.6,
+  fill: luma(90%),
+  stroke: 1pt + black,
+)={
+  element = validate-element(element)
+  electrons = validate-electrons(electrons)
   
   let loop = 0
-  for i in electrons {
-    draw_shell((shells + loop*step), i, color: color)
+  for current-shell in electrons {
+    draw-shell(
+      electrons: current-shell,
+      radius: (core-distance + loop*shell-distance),
+      fill: fill,
+      stroke: stroke,
+    )
     loop = loop + 1
   }
-
-  draw-core(atomic-number, mass-number, atom, radius: center, color: color)
+  
+  draw-core(
+    atomic-number: element.atomic-number, 
+    mass-number: element.mass-number, 
+    symbol: element.symbol, 
+    core-radius: core-radius, 
+    fill: fill,
+    stroke: stroke,
+  )
 }
 
-#let draw-atom-shells(atomic-number, mass-number, element, electrons, shells: 1.0, step: 0.4, center: 0.6, color: luma(90%)) = {
-    cetz.canvas({
-    import cetz.draw: *
-    draw-atom-shells-canvas(atomic-number, mass-number, element, electrons, shells: shells, step: step, center: center, color: color)
+#let atom-shells(
+  element:(
+    atomic-number: 1,
+    mass-number: 1,
+    symbol: "H",
+  ),
+  electrons: (1,),
+  core-distance: 1,
+  shell-distance: 0.4,
+  core-radius: 0.6,
+  fill: luma(90%),
+  stroke: 1pt + black,
+)={
+  element = validate-element(element)
+  electrons = validate-electrons(electrons)
+    
+  canvas({
+    draw-atom-shells(
+      element: element,
+      electrons: electrons,
+      core-distance: core-distance,
+      shell-distance: shell-distance,
+      core-radius: core-radius,
+      fill: fill,
+      stroke: stroke,
+    )
   })
+}
+
+// TODO: Draw s, p, d, f orbitals, etc
+// options:
+//   n quantum number
+//   l quantum number
+//   m quantum number
+//   s quantum number (maybe leave this one out)
+//   two color mode or single color mode
+//   rotation (?)
+
+#let draw-atom-orbital()={
+}
+#let atom-orbital()={
+}
+
+// TODO: draw hybrid orbitals
+// options:
+//   sp, sp2, sp3
+//   maybe even sp3d2 (?)
+#let draw-hybrid-orbital()={
+}
+#let hybrid-orbital()={
 }
