@@ -10,25 +10,15 @@ Draw simple atomic models consisely using the power of CeTZ and Typst.
 ## Usage
 To draw a simple atom use
 ```typst
-#draw-atom-shells(
-  element: (
-    atomic-number(proton-count),
-    mass-number(nucleon-count),
-    symbol), 
-  electrons: (2,8),
-  core-distance: 1,
-  shell-distance: 0.4,
-  core-radius: 0.6,
-  fill: luma(90%),
-  stroke: 1pt + black,
-)
+#atom-shells(element:"H")
 ```
+![image](https://raw.githubusercontent.com/Typsium/typsium-atomic/main/tests/hydrogen/ref/1.png)
 
 The electrons should be passed in an array where the index corresponds to the shell, while the value is the amount of electrons on that shell. Here is an example: 
 ```typst
-#draw-atom-shells(element:"Cu", electrons:(1, 8, 18, 2))
+#atom-shells(element:"Cu", electrons:(1, 8, 18, 2))
 ```
-![image](https://github.com/user-attachments/assets/42e3ffb2-68d1-44dc-b8e3-039e19b1e942)
+![image](https://raw.githubusercontent.com/Typsium/typsium-atomic/main/tests/int-electrons-ref/1.png)
 
 To draw the same in a CeTZ canvas, use ```draw-atom-shells```, which takes the same arguments as ```atom-shells```
 
@@ -41,5 +31,21 @@ To draw the same in a CeTZ canvas, use ```draw-atom-shells```, which takes the s
 If you'd like to exclusively draw the shells (for example to draw your own core) use 
 ```typst
 draw-shell(electrons: 20, radius: 5, fill: blue, stroke: 0.5pt + gray)
+```
+
+You can use the following options to customise the way atomic draws:
+```typst
+#atom-shells(
+  element: (
+    atomic-number: 2,       // proton count
+    mass-number: 4,         // nucleon count
+    symbol: "He"),          // element name
+  electrons: (2,8),         // electrons in each shell
+  core-distance: 1,         // radius of the first shell
+  shell-distance: 0.4,      // distance between each shell
+  core-radius: 0.6,         // size of the core
+  fill: luma(90%),          // color of core and electrons
+  stroke: 1pt + black,      // stroke color and width
+)
 ```
 
