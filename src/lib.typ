@@ -58,6 +58,7 @@
 }
 
 #let validate-element(element)={
+  let electrons = none
   if type(element) != dictionary{
     let candidate
     if type(element) == str{
@@ -74,6 +75,8 @@
         mass-number: candidate.at("most-common-isotope", default: candidate.at("mass-number", default: none)),
         symbol: candidate.symbol
       )
+      let charge = candidate.at("charge", default:0)
+      electrons = candidate.atomic-number - charge
     } else{
       element = (
         atomic-number: none,
@@ -82,7 +85,7 @@
       )
     }
   }
-  return element
+  return (element, electrons)
 }
 
 #let validate-electrons(electrons)={
@@ -113,15 +116,20 @@
     mass-number: 1,
     symbol: "H",
   ),
-  electrons: (1,),
+  electrons: auto,
   core-distance: 1,
   shell-distance: 0.4,
   core-radius: 0.6,
   fill: luma(90%),
   stroke: 1pt + black,
+  validate: true,
 )={
-  element = validate-element(element)
-  electrons = validate-electrons(electrons)
+  if validate{
+    let x = validate-element(element)
+    element = x.at(0)
+    if electrons == auto and x.at(1)!= none{electrons = x.at(1)}
+    electrons = validate-electrons(electrons)
+  }
   
   let loop = 0
   for current-shell in electrons {
@@ -150,15 +158,20 @@
     mass-number: 1,
     symbol: "H",
   ),
-  electrons: (1,),
+  electrons: auto,
   core-distance: 1,
   shell-distance: 0.4,
   core-radius: 0.6,
   fill: luma(90%),
   stroke: 1pt + black,
+  validate: true,
 )={
-  element = validate-element(element)
-  electrons = validate-electrons(electrons)
+  if validate{
+    let x = validate-element(element)
+    element = x.at(0)
+    if electrons == auto and x.at(1)!= none{electrons = x.at(1)}
+    electrons = validate-electrons(electrons)
+  }
     
   canvas({
     draw-atom-shells(
@@ -169,10 +182,10 @@
       core-radius: core-radius,
       fill: fill,
       stroke: stroke,
+      validate: false
     )
   })
 }
-
 // TODO: Draw s, p, d, f orbitals, etc
 // options:
 //   n quantum number
