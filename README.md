@@ -18,7 +18,7 @@ The electrons should be passed in an array where the index corresponds to the sh
 ```typst
 #atom-shells(element:"Cu", electrons:(1, 8, 18, 2))
 ```
-![image](https://raw.githubusercontent.com/Typsium/typsium-atomic/main/tests/int-electrons-ref/1.png)
+![image](https://raw.githubusercontent.com/Typsium/typsium-atomic/main/tests/int-electrons/ref/1.png)
 
 To draw the same in a CeTZ canvas, use ```draw-atom-shells```, which takes the same arguments as ```atom-shells```
 
