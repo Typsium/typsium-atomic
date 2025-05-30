@@ -10,6 +10,7 @@ Draw simple atomic models consisely using the power of CeTZ and Typst.
 ## Usage
 To draw a simple atom use
 ```typst
+#import "@preview/typsium-atomic:0.1.1":*
 #atom-shells(element:"H")
 ```
 ![image](https://raw.githubusercontent.com/Typsium/typsium-atomic/main/tests/hydrogen/ref/1.png)

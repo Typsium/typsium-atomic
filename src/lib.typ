@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.3.2": draw, canvas
+#import "@preview/cetz:0.3.4": draw, canvas
 #import "@preview/typsium:0.2.0": get-element
 
 
