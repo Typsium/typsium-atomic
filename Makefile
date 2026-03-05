@@ -28,6 +28,6 @@ bump-patch:
 	sed -i '' "s|@preview/$(PACKAGE_NAME):$$current_version|@preview/$(PACKAGE_NAME):$$new_version|" README.md; \
 	echo "Version bumped to $$new_version"
 	
-CETZ_VERSION ?= 0.3.4
+CETZ_VERSION ?= 0.4.2
 bump-cetz:
 	find ./src -type f -exec perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' {} +
