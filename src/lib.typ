@@ -23,6 +23,7 @@
   radius: 1,
   fill: luma(90%),
   stroke: 1pt + black,
+  charge-symbol: pad(bottom: 0.17em, math.minus),
 )={
   import draw: set-style, circle, content
   set-style(content: (padding: .2), fill: fill, stroke: stroke)
@@ -34,7 +35,7 @@
       (radius*calc.sin(360deg/electrons*i),
       radius*calc.cos(360deg/electrons*i)),
       radius: 0.13)
-    content((), padding: (bottom: 0.05),text(0.7em, math.minus))
+    content((),text(0.7em, charge-symbol))
   }
 }
 
@@ -122,6 +123,7 @@
   core-radius: 0.6,
   fill: luma(90%),
   stroke: 1pt + black,
+  charge-symbol: pad(bottom: 0.17em, math.minus),
   validate: true,
 )={
   if validate{
@@ -138,6 +140,7 @@
       radius: (core-distance + loop*shell-distance),
       fill: fill,
       stroke: stroke,
+      charge-symbol: charge-symbol,
     )
     loop = loop + 1
   }
